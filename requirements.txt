@@ -1,0 +1,8 @@
+requests
+python-dotenv
+chromadb
+sentence-transformers
+pypdf
+python-docx
+beautifulsoup4
+openpyxl
