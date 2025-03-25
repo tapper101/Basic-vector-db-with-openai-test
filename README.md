@@ -1,4 +1,4 @@
-# Local LLM with Vector DB
+# OpenAI with Vector DB
 
 A Python application that combines OpenAI's API with ChromaDB for document querying and AI-enhanced responses. This project allows you to load documents (including Excel files), store them in a vector database, and query them using natural language with AI-powered responses.
 
