@@ -1,5 +1,3 @@
-# doc_loader.py
-#from PyPDF2 import PdfReader
 from pypdf import PdfReader
 import docx
 from bs4 import BeautifulSoup
@@ -31,8 +29,8 @@ def load_excel(path):
     sheet = workbook.active
 
     rows = list(sheet.iter_rows(values_only=True))
-    header = rows[0]  # Assumes first row is header
-    data_rows = rows[1:]  # Exclude header
+    header = rows[0][:12]  # ✅ Limit header to first 12 columns
+    data_rows = [row[:12] for row in rows[1:]]  # ✅ Limit each row to first 12 columns
 
     return header, data_rows
 
@@ -41,11 +39,19 @@ def chunk_excel_rows(header, data_rows):
     metadatas = []
 
     for idx, row in enumerate(data_rows):
-        metadata = {f"col_{header[i]}": row[i] for i in range(min(7, len(row)))}
-        content_cells = row[7:] if len(row) > 7 else []
+        metadata = {
+            f"col_{header[i]}": str(row[i]) if row[i] is not None else ""
+            for i in range(min(9, len(row)))
+        }
+        content_cells = row[9:] if len(row) > 9 else []
         content = " | ".join(str(cell) for cell in content_cells if cell is not None)
 
-        chunks.append(content if content else "No content")
+        # Split at pipe to isolate matchable content
+        question_part = content.split("|")[0].strip() if "|" in content else content
+        full_content = content if content else "No content"
+
+        # Use question part for embedding, full content for context
+        chunks.append({"embed": question_part, "full": full_content})
         metadatas.append(metadata)
 
     return chunks, metadatas
